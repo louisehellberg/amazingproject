@@ -1,11 +1,30 @@
 import React from 'react';
 import { SafeAreaView, Text, View, Button, TouchableOpacity, Image, StyleSheet, Vibration } from 'react-native';
+// Import the react-native-sound module
+var Sound = require('react-native-sound');
 
 const Result = ({ navigation, route }) => {
 
+    var explosion_sound = new Sound('../Assets/explosion-01.wav', Sound.MAIN_BUNDLE, (error) => {
+        if (error) {
+            console.log('failed to load the sound', error);
+            return;
+        }
+        // loaded successfully
+        console.log('duration in seconds: ' + explosion_sound.getDuration() + 'number of channels: ' + explosion_sound.getNumberOfChannels());
+        // Play the sound with an onEnd callback
+        explosion_sound.play((success) => {
+            if (success) {
+                console.log('successfully finished playing');
+            } else {
+                console.log('playback failed due to audio decoding errors');
+            }
+        });
+    });
+
     const PlayAgainButton = ({ onPress, title }) => (
         <TouchableOpacity onPress={onPress} style={styles.appButtonContainer}>
-        <Text style={styles.appButtonText}>{title}</Text>
+            <Text style={styles.appButtonText}>{title}</Text>
         </TouchableOpacity>
     );
 
@@ -16,22 +35,21 @@ const Result = ({ navigation, route }) => {
             return (
                 <View>
                     {Vibration.vibrate([50,50,50], true)}
-
-                <Text style={styles.infoTitle}>Sorry, you lost!</Text>
-                <Image
-                    style={styles.resultImage}
-                    source={require('../Assets/openexplosion.png')}
-                />
+                    <Text style={styles.infoTitle}>Sorry, you lost!</Text>
+                    <Image
+                        style={styles.resultImage}
+                        source={require('../Assets/openexplosion.png')}
+                    />
                 </View>
             );
         } else {
             return (
                 <View>
-                <Text style={styles.infoTitle}>Congrats, you won!</Text>
-                <Image
-                    style={styles.resultImage}
-                    source={require('../Assets/open.png')}
-                />
+                    <Text style={styles.infoTitle}>Congrats, you won!</Text>
+                    <Image
+                        style={styles.resultImage}
+                        source={require('../Assets/open.png')}
+                    />
                 </View>
             );
         }
@@ -42,10 +60,10 @@ const Result = ({ navigation, route }) => {
 
         <View style={styles.chestContainer}>
             {DisplayChest()}
+            {explosion_sound.release()}
         </View>
             
         <View style={styles.buttonContainer}>
-        
             <PlayAgainButton title="Play again" onPress={() => navigation.navigate('Game1')}/>
         </View>
 
@@ -89,7 +107,6 @@ infoTitle: {
     color: 'white',
     fontSize: 40
     },
-
 });
 
   export default Result;
